@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include<cstring>
 #include <stack>
 #include <vector>
 using namespace std;
@@ -26,7 +25,6 @@ struct StudentNode{
         this->right = right;
     }
 };
-
 int getHeight(StudentNode* Root){
     if(Root == nullptr){
         return 0;
@@ -138,6 +136,7 @@ void PreorderTraversal(StudentNode* Root){
         }
     }
 }
+
 void PostOrderRecurs(StudentNode* Root, int head){
     if(Root == nullptr){
         return;
@@ -151,6 +150,7 @@ void PostOrderRecurs(StudentNode* Root, int head){
         cout<<Root->ID<<", ";
     }
 }
+
 void PostOrderTraversal(StudentNode* Root){
     PostOrderRecurs(Root,Root->ID);
 }
@@ -173,6 +173,7 @@ StudentNode* FindID(StudentNode* Root, int ID){
     }
     return temp;
 }
+
 StudentNode* FindPrev(StudentNode* Root, int key){
     auto temp0 = Root;
     bool zeh_bool = true;
@@ -202,6 +203,7 @@ StudentNode* FindPrev(StudentNode* Root, int key){
     }
     return temp0;
 };
+
 vector<StudentNode*> FindNAME(StudentNode* Root, string name) {
     //used inorder traversal to iterate through list with some modifications
     vector<StudentNode*> nodes_nameFound;
@@ -223,12 +225,13 @@ vector<StudentNode*> FindNAME(StudentNode* Root, string name) {
     }
     return nodes_nameFound;
 }
+
 StudentNode* RemoveID(StudentNode* Root, int key) {
     auto nodeR = FindID(Root, key);
     if(nodeR == nullptr){
         return nullptr;
     }
-    bool is_Left_Child = false;
+    bool is_Left_Child;
     auto nodeR_Parent = FindPrev(Root, key);
     if(nodeR_Parent->ID < key){
         is_Left_Child = false;
@@ -246,7 +249,7 @@ StudentNode* RemoveID(StudentNode* Root, int key) {
         delete nodeR;
         return Root;
     }
-    //1 nino
+        //1 nino
     else if(nodeR->right== nullptr && nodeR->left!= nullptr){
         if(is_Left_Child){
             nodeR_Parent->left = nodeR->left;
@@ -280,17 +283,18 @@ StudentNode* RemoveID(StudentNode* Root, int key) {
 }
 
 class AVL{
-public:
+private:
     StudentNode* headRoot;
+public:
     AVL(){}
-    bool isValidBst(){};
-
+    int num_nodes=0;
     StudentNode* Insert(StudentNode* Root, string name,int key){
         StudentNode* peer;
         if (Root == nullptr){
             peer = new StudentNode(key, name);
             peer ->right= nullptr;
             peer ->left = nullptr;
+            num_nodes++;
             return peer;
         }
         if(key == Root->ID){
@@ -327,6 +331,34 @@ public:
         }
         return Root;
     }
+    StudentNode* removeInorder(StudentNode* Root, int Nth){
+        //we will first go over with an inorder traversal and add a counter to stop at the nth index
+        if(Root == nullptr||Nth < 0){
+            cout<<"unsuccessful"<<endl;
+        }
+        int counter=0;
+        auto temp = Root;
+        if(Nth > num_nodes){
+            cout<<"unsuccessful"<<endl;
+            return nullptr;
+        }
+        stack<StudentNode*> stackity_stack;
+        while(temp != nullptr || stackity_stack.empty() == false){
+            while(temp != nullptr){
+                stackity_stack.push(temp);
+                temp = temp->left;
+            }
+            if(counter == Nth){
+                cout<<"successful"<<endl;
+                RemoveID(Root,stackity_stack.top()->ID);
+                return Root;
+            }
+            counter++;
+            temp = stackity_stack.top();
+            stackity_stack.pop();
+            temp = temp->right;
+        }
+    }
 
 
 };
@@ -339,26 +371,34 @@ void ExecuteCommand(string command, AVL &avl){
 }
 int main() {
     //start accepting commands
-//    AVL avl;
-//    StudentNode* Root = nullptr;
-//    Root = avl.Insert(Root,"terry",3);
-//    Root = avl.Insert(Root,"vicky",60);
-//    Root = avl.Insert(Root, "momma",2);
-//    Root = avl.Insert(Root,"jordan",70);
-//    Root = avl.Insert(Root,"killme",-5);
-//    Root = avl.Insert(Root,"i cant think of names",40);
-//    Root = avl.Insert(Root,"Hunting",0);
-//    Root = avl.Insert(Root,"Dirty",21);
-//    Root = avl.Insert(Root,"Ladybugs",64);
-//    Root = avl.Insert(Root,"i love",1);
-//    Root = avl.Insert(Root,"butter",-9);
-//    Root = avl.Insert(Root,"from plants",-50);
-//    Root = avl.Insert(Root,"timmy",-100);
-//    Root = avl.Insert(Root,"timmy",56);
-//    Root = avl.Insert(Root,"kyle",-100);
-//    Root = avl.Insert(Root,"stan",-700);
-//    Root = avl.Insert(Root,"carrie",-900);
-//    cout<<getHeight(Root)<<endl;
+    AVL avl;
+    StudentNode* Root = nullptr;
+    Root = avl.Insert(Root,"terry",3);
+    Root = avl.Insert(Root,"vicky",60);
+    Root = avl.Insert(Root, "momma",2);
+    Root = avl.Insert(Root,"jordan",70);
+
+    Root = avl.Insert(Root,"killme",-5);
+    Root = avl.Insert(Root,"i cant think of names",40);
+    Root = avl.Insert(Root,"Hunting",0);
+    Root = avl.Insert(Root,"Dirty",21);
+
+    Root = avl.Insert(Root,"Ladybugs",64);
+    Root = avl.Insert(Root,"i love",1);
+    Root = avl.Insert(Root,"butter",-9);
+    Root = avl.Insert(Root,"from plants",-50);
+
+    Root = avl.Insert(Root,"timmy",-100);
+    Root = avl.Insert(Root,"timmy",56);
+    Root = avl.Insert(Root,"kyle",-100);
+    Root = avl.Insert(Root,"stan",-700);
+
+    cout<<avl.num_nodes<<endl;
+    InorderTraversal(Root);
+    avl.removeInorder(Root,0);
+
+    InorderTraversal(Root);
+
 //    cout<<getBF(Root)<<endl;
 //    InorderTraversal(Root);
 //    PreorderTraversal(Root);
@@ -376,8 +416,8 @@ int main() {
         getline(cin,instruction);
         instructions.push_back(instruction);
     }
-    AVL gator_avl;
-    StudentNode* Root = nullptr;
+//    AVL gator_avl;
+//    StudentNode* Root = nullptr;
 
     return 0;
 }

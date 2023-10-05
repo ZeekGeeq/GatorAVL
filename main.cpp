@@ -2,6 +2,9 @@
 #include <string>
 #include <stack>
 #include <vector>
+#include <sstream>
+#include <iomanip>
+
 using namespace std;
 
 
@@ -362,12 +365,30 @@ public:
 
 
 };
-void ExecuteCommand(string command, AVL &avl){
-    string name;
-    int ID;
-
-
-
+//===============================Helper Functions===================================
+string removeQuotes(string& input) {
+    if (input.size() >= 2 && input.front() == '"' && input.back() == '"') {
+        return input.substr(1, input.size() - 2);
+    } else {
+        return input;
+    }
+}
+vector<string> splitString(string& input) {
+    vector<std::string> strings_sep;
+    string currentPart;
+    istringstream iss(input);
+    //bless the sstream library
+    while (iss >> quoted(currentPart)) {
+        strings_sep.push_back(removeQuotes(currentPart));
+    }
+    return strings_sep;
+}
+//=================================================================================
+void ExecuteCommand(string command, AVL &avl, StudentNode* &Root){
+    vector<string>commands_names_IDs = splitString(command);
+    for(int i =0; i < commands_names_IDs.size();i++){
+        cout<<commands_names_IDs[i]<<endl;
+    }
 }
 int main() {
     //start accepting commands
@@ -416,6 +437,7 @@ int main() {
         getline(cin,instruction);
         instructions.push_back(instruction);
     }
+    ExecuteCommand(instructions[0],avl,Root);
 //    AVL gator_avl;
 //    StudentNode* Root = nullptr;
 

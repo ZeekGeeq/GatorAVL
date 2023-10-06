@@ -64,7 +64,7 @@ public:
     };
 
     int getHeight(StudentNode* Root){
-        if(Root == nullptr){
+        if(Root == nullptr || num_nodes ==0){
             return 0;
         }
         else{
@@ -101,7 +101,7 @@ public:
         int key_int = stoi(key);
         StudentNode* peer;
 
-        if (Root == nullptr){
+        if (Root == nullptr || num_nodes==0){
             peer = new StudentNode(key, name);
             peer ->right= nullptr;
             peer ->left = nullptr;
@@ -346,6 +346,7 @@ public:
         //we will first go over with an inorder traversal and add a counter to stop at the nth index
         if(Root == nullptr||Nth < 0){
             cout<<"unsuccessful"<<endl;
+            return Root;
         }
         if((0>Nth || Nth >= getNodeCount())){
             cout<<"unsuccessful"<<endl;
@@ -464,6 +465,9 @@ vector<string> splitString(string& input) {
 }
 //=================================================================================
 void ExecuteCommand(string command, AVL &avl) {
+    if(avl.getNodeCount()==0){
+        avl.set_root(nullptr);
+    }
     vector<string> commands_names_IDs = splitString(command);
     if(!Validate_input(commands_names_IDs)){
         unsuccess();
@@ -496,8 +500,7 @@ void ExecuteCommand(string command, AVL &avl) {
             unsuccess();
             return;
         }
-        StudentNode* Node = avl.removeID(avl.getRoot(),commands_names_IDs[1]);
-        avl.set_root(Node);
+        avl.set_root(avl.removeID(avl.getRoot(),commands_names_IDs[1]));
         success();
         return;
     }
@@ -516,7 +519,7 @@ void ExecuteCommand(string command, AVL &avl) {
     else if(commands_names_IDs[0].compare("search")==0){
         if(validate_number(commands_names_IDs[1])){
             if(avl.FindID(avl.getRoot(),commands_names_IDs[1])!= nullptr){
-                cout<<"\""<<avl.FindID(avl.getRoot(),commands_names_IDs[1])->NAME<<"\""<<endl;
+                cout<<avl.FindID(avl.getRoot(),commands_names_IDs[1])->NAME<<endl;
             }
             else{
                 unsuccess();
@@ -535,17 +538,12 @@ void ExecuteCommand(string command, AVL &avl) {
         }
     }
     else if(commands_names_IDs[0].compare("removeInorder")==0){
-        auto node = avl.removeInorder(avl.getRoot(),stoi(commands_names_IDs[1]));
-        avl.set_root(node);
+        avl.set_root(avl.removeInorder(avl.getRoot(),stoi(commands_names_IDs[1])));
     }
-    unsuccess();
-    return;
+    else if(commands_names_IDs[0].compare("printLevelCount")==0){
+        cout<<avl.getHeight(avl.getRoot())<<endl;
+    }
 }
-
-
-
-
-
 int main() {
     AVL avl;
 

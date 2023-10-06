@@ -347,7 +347,7 @@ public:
         if(Root == nullptr||Nth < 0){
             cout<<"unsuccessful"<<endl;
         }
-        if((0>=Nth || Nth >= getNodeCount())){
+        if((0>Nth || Nth >= getNodeCount())){
             cout<<"unsuccessful"<<endl;
             return Root;
         }
@@ -409,7 +409,14 @@ bool Validate_input(vector<string> input){
             return true;
         }
     }
-    else if(input[0].compare("search")==0){}
+    else if(input[0].compare("search")==0){
+        if(input.size()!= 2 && (!validate_number(input[0])||!validate_name(input[0]))){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
     else if(input[0].compare("printInorder")==0){
         if(input.size()!=1){return false;}
         else{return true;}
@@ -422,7 +429,19 @@ bool Validate_input(vector<string> input){
         if(input.size()!=1){return false;}
         else{return true;}
     }
-    else if(input[0].compare("printLevelCount")==0){}
+    else if(input[0].compare("printLevelCount")==0){
+        if(input.size()!=1){return false;}
+        else{return true;}
+    }
+    else if(input[0].compare("removeInorder")==0){
+        if(input.size()!=2){
+            return false;
+        }
+        if(validate_number(input[1])){
+            return false;
+        }
+        return true;
+    }
     return false;
 
 }
@@ -445,7 +464,6 @@ vector<string> splitString(string& input) {
 }
 //=================================================================================
 void ExecuteCommand(string command, AVL &avl) {
-    auto Root = avl.getRoot();
     vector<string> commands_names_IDs = splitString(command);
     if(!Validate_input(commands_names_IDs)){
         unsuccess();
@@ -495,6 +513,33 @@ void ExecuteCommand(string command, AVL &avl) {
         avl.PostOrderTraversal();
         return;
     }
+    else if(commands_names_IDs[0].compare("search")==0){
+        if(validate_number(commands_names_IDs[1])){
+            if(avl.FindID(avl.getRoot(),commands_names_IDs[1])!= nullptr){
+                cout<<"\""<<avl.FindID(avl.getRoot(),commands_names_IDs[1])->NAME<<"\""<<endl;
+            }
+            else{
+                unsuccess();
+            }
+        }
+        else if(validate_name(commands_names_IDs[1])){
+            auto names = avl.FindNAME(avl.getRoot(),commands_names_IDs[1]);
+            if(names.size()==0){
+                unsuccess();
+                return;
+            }
+            for(int i = 0; i<names.size();i++){
+                cout<<names[i]->exact_key<<endl;
+            }
+            return;
+        }
+    }
+    else if(commands_names_IDs[0].compare("removeInorder")==0){
+        auto node = avl.removeInorder(avl.getRoot(),stoi(commands_names_IDs[1]));
+        avl.set_root(node);
+    }
+    unsuccess();
+    return;
 }
 
 

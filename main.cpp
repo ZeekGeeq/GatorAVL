@@ -3,6 +3,7 @@
 #include <stack>
 #include <vector>
 #include<regex>
+#include <bits/stdc++.h>
 #include <sstream>
 #include <iomanip>
 
@@ -30,8 +31,8 @@ struct StudentNode{
     }
 };
 class AVL{
-    StudentNode* head_root;
     int num_nodes;
+    StudentNode* head_root;
 public:
     AVL(){
         num_nodes = 0;
@@ -162,14 +163,14 @@ public:
         while(!nodes.empty()){
             temp = nodes.top();
             if (temp->ID != max){
-                cout<<temp->exact_key<<", ";
+                cout<<temp->NAME<<", ";
             }
             else if (temp->ID == max && temp->right == nullptr && temp->left != nullptr){
-                cout<<temp->exact_key<<", "<<temp->left->exact_key<<endl;
+                cout<<temp->NAME<<", "<<temp->left->NAME<<endl;
                 return;
             }
             else if (temp->ID == max && temp ->left == nullptr && temp ->right == nullptr){
-                cout<<temp->exact_key<<endl;
+                cout<<temp->NAME<<endl;
                 return;
             }
             nodes.pop();
@@ -198,10 +199,10 @@ public:
             temp = stackity_stack.top();
             stackity_stack.pop();
             if(temp->ID != max_value){
-                cout<<temp->exact_key<<", ";
+                cout<<temp->NAME<<", ";
             }
             else{
-                cout<<temp->exact_key<<endl;
+                cout<<temp->NAME<<endl;
             }
             temp = temp->right;
         }
@@ -215,10 +216,10 @@ public:
         PostOrderRecurs(Root->left, head);
         PostOrderRecurs(Root->right, head);
         if(Root->ID == head){
-            cout<<Root->exact_key<<endl;
+            cout<<Root->NAME<<endl;
         }
         else{
-            cout<<Root->exact_key<<", ";
+            cout<<Root->NAME<<", ";
         }
     }
     void PostOrderTraversal(){
@@ -299,61 +300,47 @@ public:
         }
         return nodes_nameFound;
     }
-    StudentNode* RemoveID(StudentNode* Root, string exact_key) {
-        auto nodeR = FindID(Root, exact_key);
-        if(nodeR == nullptr){
+    StudentNode* removeID(StudentNode* root, string exact_key)
+    {
+        if (root == nullptr){
             return nullptr;
         }
-        int key = stoi(exact_key);
-        bool is_Left_Child;
-        auto nodeR_Parent = FindPrev(Root, exact_key);
-        if(nodeR_Parent->ID < key){
-            is_Left_Child = false;
-        }
-        else{
-            is_Left_Child = true;
-        }
-        if(nodeR->right == nullptr && nodeR->left == nullptr){
-            if(is_Left_Child){
-                FindPrev(Root,exact_key)->left= nullptr;
+        int ID = stoi(exact_key);
+        if (ID > root->ID)
+            root->right = removeID(root->right, exact_key);
+        else if (ID < root->ID)
+            root->left = removeID(root->left, exact_key);
+        else {
+            if (root->left == nullptr && root->right == nullptr){
+                delete root;
+                num_nodes--;
+                root = nullptr;
+                return root;
+            }
+            else if(root->right == nullptr){
+                StudentNode* temp = root;
+                root = root->left;
+                num_nodes--;
+                delete temp;
+                return root;
+            }
+            else if(root->left == nullptr){
+                StudentNode* temp = root;
+                root = root->right;
+                num_nodes--;
+                delete temp;
+                return root;
             }
             else{
-                FindPrev(Root,exact_key)->right = nullptr;
+                StudentNode* temp = getMinNode(root->right);
+                root->ID = temp->ID;
+                root->NAME = temp->NAME;
+                root->exact_key = temp->exact_key;
+                root->right = removeID(root->right, root->exact_key);
+                return root;
             }
-            delete nodeR;
-            return Root;
         }
-            //1 nino
-        else if(nodeR->right== nullptr && nodeR->left!= nullptr){
-            if(is_Left_Child){
-                nodeR_Parent->left = nodeR->left;
-            }
-            else{
-                nodeR_Parent->right = nodeR->left;
-            }
-            delete nodeR;
-            return Root;
-        }
-        else if(nodeR->right != nullptr && nodeR ->left == nullptr){
-            if(is_Left_Child){
-                nodeR_Parent->left = nodeR->right;
-            }
-            else{
-                nodeR_Parent->right = nodeR->right;
-            }
-            delete nodeR;
-            return Root;
-        }
-        else{
-            //2 children
-            auto successor=getMinNode(nodeR->right);
-            nodeR->ID = successor->ID;
-            nodeR->NAME = successor->NAME;
-            nodeR->right = RemoveID(nodeR->right, nodeR->exact_key);
-            return Root;
-        }
-        //implement other cases later
-        return Root;
+        return root;
     }
     StudentNode* removeInorder(StudentNode* Root, int Nth){
         //we will first go over with an inorder traversal and add a counter to stop at the nth index
@@ -374,7 +361,7 @@ public:
             }
             if(counter == Nth){
                 cout<<"successful"<<endl;
-                RemoveID(Root,stackity_stack.top()->exact_key);
+                removeID(Root,stackity_stack.top()->exact_key);
                 return Root;
             }
             counter++;
@@ -386,14 +373,19 @@ public:
 
 };
 
-
+void unsuccess(){
+    cout<<"unsuccessful"<<endl;
+}
+void success(){
+    cout<<"successful"<<endl;
+}
 
 
 
 
 bool validate_name(string name){
     regex place("[a-zA-Z\\s\"]+");
-    return (regex_match(name,place)&&name.front()=='\"'&&name.back()=='\"');
+    return regex_match(name,place);
 }
 bool validate_number(string num){
     regex place("[0-9]+");
@@ -402,14 +394,34 @@ bool validate_number(string num){
 bool Validate_input(vector<string> input){
     if(input.size()==0){return false;}
     if(input[0].compare("insert")==0){
-        if)_
+        if(input.size() != 3 || !validate_name(input[1]) || !validate_number(input[2])){
+            return false;
+        }
+        else{
+            return true;
+        }
     }
-    else if(input[0].compare("remove")==0){}
+    else if(input[0].compare("remove")==0){
+        if(input.size() != 2 || !validate_number(input[1])){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
     else if(input[0].compare("search")==0){}
-    else if(input[0].compare("printInorder")==0){}
-    else if(input[0].compare("printPreorder")==0){}
-    else if(input[0].compare("printPostorder")==0){}
-    else if(input[0].compare("printLevelCount")==0){}
+    else if(input[0].compare("printInorder")==0){
+        if(input.size()!=1){return false;}
+        else{return true;}
+    }
+    else if(input[0].compare("printPreorder")==0){
+        if(input.size()!=1){return false;}
+        else{return true;}
+    }
+    else if(input[0].compare("printPostorder")==0){
+        if(input.size()!=1){return false;}
+        else{return true;}
+    }
     else if(input[0].compare("printLevelCount")==0){}
     return false;
 
@@ -427,17 +439,61 @@ vector<string> splitString(string& input) {
     istringstream iss(input);
     //bless the sstream library
     while (iss >> quoted(currentPart)) {
-        cout<<currentPart<<endl;
         strings_sep.push_back(currentPart);
     }
     return strings_sep;
 }
 //=================================================================================
-void ExecuteCommand(string command, AVL &avl, StudentNode* &Root) {
+void ExecuteCommand(string command, AVL &avl) {
+    auto Root = avl.getRoot();
     vector<string> commands_names_IDs = splitString(command);
-
-    for (int i = 0; i < commands_names_IDs.size(); i++) {
-        cout << commands_names_IDs[i] << endl;
+    if(!Validate_input(commands_names_IDs)){
+        unsuccess();
+        return;
+    }
+    if(commands_names_IDs[0].compare("insert")==0){
+        if(count(command.begin(),command.end(),'\"')!=2){
+            unsuccess();
+            return;
+        }
+        if(avl.getRoot() == nullptr){
+            StudentNode* Node = avl.Insert(avl.getRoot(),commands_names_IDs[1],commands_names_IDs[2]);
+            avl.set_root(Node);
+            success();
+            return;
+        }
+        else if(avl.FindID(avl.getRoot(),commands_names_IDs[2])== nullptr){
+            StudentNode* Node = avl.Insert(avl.getRoot(),commands_names_IDs[1],commands_names_IDs[2]);
+            avl.set_root(Node);
+            success();
+            return;
+        }
+        else{
+            unsuccess();
+            return;
+        }
+    }
+    else if(commands_names_IDs[0].compare("remove")==0){
+        if(avl.FindID(avl.getRoot(),commands_names_IDs[1])== nullptr){
+            unsuccess();
+            return;
+        }
+        StudentNode* Node = avl.removeID(avl.getRoot(),commands_names_IDs[1]);
+        avl.set_root(Node);
+        success();
+        return;
+    }
+    else if(commands_names_IDs[0].compare("printPreorder")==0){
+        avl.PreorderTraversal();
+        return;
+    }
+    else if(commands_names_IDs[0].compare("printInorder")==0){
+        avl.InorderTraversal();
+        return;
+    }
+    else if(commands_names_IDs[0].compare("printPostorder")==0){
+        avl.PostOrderTraversal();
+        return;
     }
 }
 
@@ -457,6 +513,8 @@ int main() {
         getline(cin,instruction);
         instructions.push_back(instruction);
     }
-
+    for(int c = 0;c<command_cnt;c++){
+        ExecuteCommand(instructions[c],avl);
+    }
     return 0;
 }

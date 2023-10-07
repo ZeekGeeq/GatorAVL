@@ -546,7 +546,6 @@ void ExecuteCommand(string command, AVL &avl) {
 }
 int main() {
     AVL avl;
-
     int command_cnt;
     cin>>command_cnt;
     vector<string>instructions;

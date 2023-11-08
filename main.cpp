@@ -6,7 +6,7 @@
 #include <bits/stdc++.h>
 #include <sstream>
 #include <iomanip>
-
+#include<chrono>
 using namespace std;
 struct StudentNode{
     StudentNode* left;
@@ -555,8 +555,12 @@ int main() {
         getline(cin,instruction);
         instructions.push_back(instruction);
     }
+    auto start = std::chrono::high_resolution_clock::now();
     for(int c = 0;c<command_cnt;c++){
         ExecuteCommand(instructions[c],avl);
     }
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    cout<<duration.count()<<endl;
     return 0;
 }
